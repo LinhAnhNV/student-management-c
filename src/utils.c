@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "utils.h"
 
 void xoa_ky_tu_xuong_dong(char *s) {
@@ -77,4 +78,11 @@ int ngayTrongThang(int month, int year) {
     else if(month == 4 || month == 6 || month == 9 || month == 11) return 30;
     else return 31;
 }
-
+int tinh_tuoi(Date dob) {
+    time_t t = time(NULL);
+    struct tm *now = localtime(&t);
+    int tuoi = (now->tm_year + 1900) - dob.year;
+    if (now->tm_mon + 1 < dob.month ||
+         (now->tm_mon + 1 == dob.month && now->tm_mday < dob.day)) tuoi--;
+    return tuoi;
+}

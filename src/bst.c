@@ -181,3 +181,23 @@ void bst_sort_and_print(BSTNode *root, int (*cmp)(const void*, const void*)) {
     }
     printf("+------------+----------------------+------------------+------------+------+\n");
 }
+
+void bst_export_report(BSTNode *root, const char *filename) {
+    FILE *f = fopen(filename, "w");
+    if (!f) {
+        printf("Loi mo file %s\n", filename);
+        return;
+    }
+    fprintf(f, "+------------+----------------------+------------------+------------+------+\n");
+    fprintf(f, "| %-10s | %-20s | %-16s | %-10s | %-4s |\n",
+        "MSSV", "Ten", "Nganh", "Ngay sinh", "GPA");
+    fprintf(f, "+------------+----------------------+------------------+------------+------+\n");
+    Student arr[1000];
+    int n = bst_to_array(root, arr, 1000);
+    for (int i = 0; i < n; i++) {
+        fprintf(f, "| %-10s | %-20s | %-16s | %02d/%02d/%04d | %.2f |\n", arr[i].mssv, arr[i].name,
+             arr[i].major, arr[i].dob.day, arr[i].dob.month, arr[i].dob.year, arr[i].gpa);
+    }
+    fprintf(f, "+------------+----------------------+------------------+------------+------+\n");
+    fclose(f);
+}

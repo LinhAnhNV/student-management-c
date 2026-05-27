@@ -20,6 +20,7 @@ void     bst_free(BSTNode *root);
 void     bst_save(BSTNode *root, const char *filename);
 void     bst_load(BSTNode **root, const char *filename);
 void bst_sort_and_print(BSTNode *root, int (*cmp)(const void*, const void*));
+void bst_export_report(BSTNode *root, const char *filename);
 int bst_to_array(BSTNode *root, Student *arr, int max);
 int cmp_by_gpa(const void *a, const void *b);
 int cmp_by_name(const void *a, const void *b);

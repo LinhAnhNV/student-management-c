@@ -64,12 +64,13 @@ void menu() {
     printf("\n|=======================================|");
     printf("\n| 1. Them mot sinh vien                 |");
     printf("\n| 2. Tim thong tin sinh vien theo MSSV  |");
-    printf("\n| 3. Xoa sinh vien                      |");
+    printf("\n| 3. Xoa mot sinh vien                  |");
     printf("\n| 4. Xuat danh sach (da sort theo MSSV) |");
     printf("\n| 5. Sua thong tin sinh vien            |");
     printf("\n| 6. Tim thong tin sinh vien theo ten   |");
     printf("\n| 7. Thong ke GPA                       |");
     printf("\n| 8. Sort theo GPA, ten, nganh          |");
+    printf("\n| 9. Xuat bao cao                       |");
     printf("\n| 0. Luu va thoat                       |");
     printf("\n|=======================================|");
 }
@@ -79,7 +80,7 @@ int main() {
     int choice;
     do {
         menu();
-        choice = nhap_so_nguyen("\nLua chon: ", 0, 8);
+        choice = nhap_so_nguyen("\nLua chon: ", 0, 9);
         switch(choice) {
             case 1: {
                 Student s;
@@ -99,8 +100,19 @@ int main() {
             case 3: {
                 char mssv[12];
                 nhap_chuoi("Nhap MSSV can xoa: ", mssv, sizeof(mssv) - 1);
-                root = bst_delete(root, mssv);
-                printf("Da xoa!\n");
+                BSTNode *found = bst_search(root, mssv);
+                if (!found) {
+                    printf("Khong tim thay MSSV %s\n", mssv);
+                    break;
+                }
+                student_print(&found->data);
+                printf("Ban co chac muon xoa? (y/n): ");
+                char c;
+                scanf(" %c", &c);
+                if (c == 'y' || c == 'Y') {
+                    root = bst_delete(root, mssv);
+                    printf("Da xoa!\n");
+                } else printf("Huy xoa!\n");
                 break;
             }
             case 4: {
@@ -132,8 +144,14 @@ int main() {
                 else bst_sort_and_print(root, cmp_by_major);
                 break;
             }
+            case 9:{
+                bst_export_report(root, "report.csv");
+                printf("Da xuat ra report.csv!\n");
+                break;
+            }
             case 0:{
                 bst_save(root, "data.csv");
+                bst_save(root, "data_backup.csv");
                 bst_free(root);
                 printf("Tam biet!\n");
                 break;
