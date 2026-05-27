@@ -2,34 +2,84 @@
 #include <stdlib.h>
 #include <string.h>
 #include "bst.h"
+#include "utils.h"
 
 BSTNode *root = NULL;
 
 void input_student(Student *s) {
-    printf("MSSV   : "); scanf("%s", s->mssv);
-    printf("Ten    : "); scanf(" %[^\n]", s->name);
-    printf("Nganh  : "); scanf(" %[^\n]", s->major);
-    printf("GPA    : "); scanf("%f", &s->gpa);
+    do {
+        nhap_chuoi("MSSV   : ", s->mssv, sizeof(s->mssv) - 1);
+        if(bst_search(root, s->mssv) != NULL) printf("MSSV %s da ton tai! Vui long nhap lai.\n", s->mssv);
+    } while(bst_search(root, s->mssv) != NULL);
+    nhap_chuoi("Ten    : ", s->name, sizeof(s->name) - 1);
+    nhap_chuoi("Nganh  : ", s->major, sizeof(s->major) - 1);
+    do {
+        s->dob.day = nhap_so_nguyen("Ngay sinh - Ngay: ", 1, 31);
+        s->dob.month = nhap_so_nguyen("Ngay sinh - Thang: ", 1, 12);
+        s->dob.year = nhap_so_nguyen("Ngay sinh - Nam: ", 1900, 2100);
+        if(s->dob.day > ngayTrongThang(s->dob.month, s->dob.year)) {
+            printf("Ngay khong hop le cho thang %d nam %d. Vui long nhap lai.\n", s->dob.month, s->dob.year);
+        }
+    } while(s->dob.day > ngayTrongThang(s->dob.month, s->dob.year));
+    s->gpa = nhap_so_thuc("GPA    : ", 0.0, 4.0);
+}
+static void bst_save_recursive(BSTNode *root, FILE *f) {
+    if(!root) return;
+    bst_save_recursive(root->left, f);
+    fprintf(f, "%s|%s|%s|%02d/%02d/%04d|%.2f\n", root->data.mssv,
+         root->data.name, root->data.major, root->data.dob.day, 
+         root->data.dob.month, root->data.dob.year, root->data.gpa);
+    bst_save_recursive(root->right, f);
+}
+void bst_save(BSTNode *root, const char *filename) {
+    FILE *f = fopen(filename, "w");
+    if(!f) {
+        printf("Loi mo file %s\n", filename);
+        return;
+    }
+    bst_save_recursive(root, f);
+    fclose(f);
+}
+void bst_load(BSTNode **root, const char *filename) {
+    FILE *f = fopen(filename, "r");
+    if(!f) {
+        printf("Loi mo file %s\n", filename);
+        return;
+    }
+    char buffer[BUFFER_SIZE];
+    while(fgets(buffer, sizeof(buffer), f)) {
+        xoa_ky_tu_xuong_dong(buffer);
+        Student s;
+        if(sscanf(buffer, "%[^|]|%[^|]|%[^|]|%d/%d/%d|%f", s.mssv, s.name,
+             s.major, &s.dob.day, &s.dob.month, &s.dob.year, &s.gpa) == 7) {
+            *root = bst_insert(*root, s);
+        } else printf("Loi dinh dang du lieu: %s\n", buffer);
+    }
+    fclose(f);
 }
 
 void menu() {
-    printf("\n|==========================|");
-    printf("\n|  STUDENT MANAGEMENT v1.0 |");
-    printf("\n|==========================|");
-    printf("\n| 1. Them sinh vien        |");
-    printf("\n| 2. Tim theo MSSV         |");
-    printf("\n| 3. Xoa sinh vien         |");
-    printf("\n| 4. Danh sach (da sort)   |");
-    printf("\n| 0. Thoat                 |");
-    printf("\n|==========================|");
-    printf("\n> ");
+    printf("\n|=======================================|");
+    printf("\n|        STUDENT MANAGEMENT v1.0        |");
+    printf("\n|=======================================|");
+    printf("\n| 1. Them mot sinh vien                 |");
+    printf("\n| 2. Tim thong tin sinh vien theo MSSV  |");
+    printf("\n| 3. Xoa sinh vien                      |");
+    printf("\n| 4. Xuat danh sach (da sort theo MSSV) |");
+    printf("\n| 5. Sua thong tin sinh vien            |");
+    printf("\n| 6. Tim thong tin sinh vien theo ten   |");
+    printf("\n| 7. Thong ke GPA                       |");
+    printf("\n| 8. Sort theo GPA, ten, nganh          |");
+    printf("\n| 0. Luu va thoat                       |");
+    printf("\n|=======================================|");
 }
 
 int main() {
+    bst_load(&root, "data.csv");
     int choice;
     do {
         menu();
-        scanf("%d", &choice);
+        choice = nhap_so_nguyen("\nLua chon: ", 0, 8);
         switch(choice) {
             case 1: {
                 Student s;
@@ -40,7 +90,7 @@ int main() {
             }
             case 2: {
                 char mssv[12];
-                printf("Nhap MSSV: "); scanf("%s", mssv);
+                nhap_chuoi("Nhap MSSV: ", mssv, sizeof(mssv) - 1);
                 BSTNode *found = bst_search(root, mssv);
                 if (found) student_print(&found->data);
                 else printf("Khong tim thay!\n");
@@ -48,20 +98,46 @@ int main() {
             }
             case 3: {
                 char mssv[12];
-                printf("Nhap MSSV can xoa: "); scanf("%s", mssv);
+                nhap_chuoi("Nhap MSSV can xoa: ", mssv, sizeof(mssv) - 1);
                 root = bst_delete(root, mssv);
                 printf("Da xoa!\n");
                 break;
             }
             case 4: {
                 if (!root) printf("Danh sach trong!\n");
-                else bst_inorder(root);
+                else bst_inorder_table(root);
                 break;
             }
-            case 0:
+            case 5: {
+                char mssv[12];
+                nhap_chuoi("Nhap MSSV can sua: ", mssv, sizeof(mssv) - 1);
+                bst_update(root, mssv);
+                break;
+            }
+            case 6: {
+                char name[50];
+                nhap_chuoi("Nhap ten can tim: ", name, sizeof(name) - 1);
+                bst_search_by_name(root, name);
+                break;
+            }
+            case 7: {
+                bst_thong_ke(root);
+                break;
+            }
+            case 8: {
+                printf("Sort theo:\n 1. GPA\t 2. Ten\t 3. Nganh\n");
+                int opt = nhap_so_nguyen("Lua chon: ", 1, 3);
+                if (opt == 1) bst_sort_and_print(root, cmp_by_gpa);
+                else if (opt == 2) bst_sort_and_print(root, cmp_by_name);
+                else bst_sort_and_print(root, cmp_by_major);
+                break;
+            }
+            case 0:{
+                bst_save(root, "data.csv");
                 bst_free(root);
                 printf("Tam biet!\n");
                 break;
+            }
             default:
                 printf("Lua chon khong hop le!\n");
         }

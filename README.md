@@ -1,17 +1,21 @@
 # Student Management System
 
-Chương trình quản lý sinh viên viết bằng C, dùng Binary Search Tree (BST) để lưu và tra cứu dữ liệu theo MSSV.
+Chương trình quản lý sinh viên viết bằng C — dùng Binary Search Tree (BST) làm cấu trúc lưu trữ chính, tra cứu theo MSSV.
 
-> A student management program written in C. Uses a Binary Search Tree keyed on student ID for storage and lookup.
+Dự án này bắt đầu từ một bài tập nhỏ, dần mở rộng thành một hệ thống có đầy đủ validation, lưu file, và thống kê. Viết tay từng dòng, debug từng lỗi.
+
+> A student management program in C using a Binary Search Tree keyed on student ID. Built incrementally — from scratch, by hand.
 
 ---
 
 ## Tính năng / Features
 
-- Thêm sinh viên / Add student
-- Tìm theo MSSV / Search by student ID
-- Xóa sinh viên / Delete student
-- In danh sách đã sắp xếp / Print sorted list (in-order traversal)
+- Thêm / xóa / sửa sinh viên
+- Tìm theo MSSV hoặc tên (hỗ trợ tìm gần đúng)
+- In danh sách đã sắp xếp dạng bảng
+- Lưu và tải dữ liệu từ file CSV
+- Thống kê GPA — trung bình, giỏi / khá / TB / yếu
+- Validation đầu vào — kiểm tra MSSV trùng, ngày hợp lệ, GPA trong khoảng 0–4
 
 ---
 
@@ -20,23 +24,25 @@ Chương trình quản lý sinh viên viết bằng C, dùng Binary Search Tree 
 ```
 student-management-c/
 ├── src/
-│   ├── main.c        # Menu chính / Main menu
-│   ├── bst.c         # Insert, search, delete, inorder, free
+│   ├── main.c        # Menu chính, xử lý input
+│   ├── bst.c         # Insert, search, delete, update, inorder, save, load, thống kê
 │   ├── bst.h
-│   ├── student.c     # In thông tin sinh viên / Print student info
-│   └── student.h     # Định nghĩa struct Student
+│   ├── student.c     # In thông tin sinh viên
+│   ├── student.h     # Struct Student, Date
+│   ├── utils.c       # Nhập chuỗi, số nguyên, số thực có validation
+│   └── utils.h
 ├── .gitignore
 ├── Makefile
 └── README.md
-```
+---
 
 ---
 
 ## Yêu cầu / Requirements
 
-- GCC
-- Windows: [MinGW](https://www.mingw-w64.org/) hoặc [MSYS2](https://www.msys2.org/)
-- Linux/macOS: GCC có sẵn hoặc `sudo apt install gcc`
+- GCC (>= 9)
+- Windows: [MinGW](https://winlibs.com/)
+- Linux/macOS: `sudo apt install gcc` hoặc có sẵn
 
 ---
 
@@ -54,7 +60,7 @@ make
 ./student_mgmt
 ```
 
-**Dọn file build / Clean:**
+**Dọn file build:**
 ```bash
 mingw32-make clean   # Windows
 make clean           # Linux/macOS
@@ -64,29 +70,22 @@ make clean           # Linux/macOS
 
 ## Về BST / About the BST
 
-Cây được sắp xếp theo MSSV (string). Duyệt in-order cho ra danh sách đã sort.
+Cây được sắp xếp theo MSSV (string). Duyệt in-order cho ra danh sách đã sort tự động — không cần thêm bước sort riêng.
 
-The tree is ordered by student ID string. An in-order traversal produces a sorted list.
+| Thao tác | Độ phức tạp |
+|----------|-------------|
+| Insert   | O(h)        |
+| Search   | O(h)        |
+| Delete   | O(h)        |
+| Inorder  | O(n)        |
 
-| Thao tác / Operation | Độ phức tạp / Complexity |
-|----------------------|--------------------------|
-| Insert               | O(h)                     |
-| Search               | O(h)                     |
-| Delete               | O(h)                     |
-| In-order traversal   | O(n)                     |
-
-`h` = chiều cao cây / tree height — `n` = số node / number of nodes
-
----
-
-## Demo
-
-*(Screenshot sẽ được cập nhật sau / Screenshot coming soon)*
+`h` = chiều cao cây — `n` = số node  
+Worst case khi dữ liệu nhập theo thứ tự: `h = n`
 
 ---
 
 ## Tác giả / Author
 
 **Nguyễn Văn Linh Anh**  
-Sinh viên CNTT — Trường ĐH Công Thương TP.HCM (HUIT)  
-IT Student — Ho Chi Minh City University of Industry and Trade 
+Sinh viên CNTT — ĐH Công Thương TP.HCM (HUIT)  
+Củ Chi, TP.HCM · 2025
