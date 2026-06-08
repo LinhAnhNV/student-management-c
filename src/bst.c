@@ -131,7 +131,7 @@ void bst_update(BSTNode *root, const char *mssv) {
     node->data.gpa = tinhGPA(node->data.gk, node->data.tl, node->data.ck);
 }
 
-// ── STATISTIC ───────────────────────────────────────
+// ── THONG KE ────────────────────────────────────────
 static void thong_ke_recursive(BSTNode *root, int *total, float *sum, int *gioi, int *kha, int *tb, int *yeu) {
     if (!root) return;
     thong_ke_recursive(root->left, total, sum, gioi, kha, tb, yeu);
@@ -206,6 +206,46 @@ void bst_export_report(BSTNode *root, const char *filename) {
     }
     fprintf(f, "+------------+----------------------+------------------+------------+-------+-------+-------+-------+\n");
     fclose(f);
+}
+
+// ── TOP 3 GPA ───────────────────────────────────────
+void bst_top3(BSTNode *root) {
+    Student arr[1000];
+    int n = bst_to_array(root, arr, 1000);
+    qsort(arr, n, sizeof(Student), cmp_by_gpa);
+    int count = n < 3 ? n : 3;
+printf("Top %d sinh vien GPA cao nhat:\n", count);
+    printf("+------------+----------------------+-------+\n");
+    printf("| %-10s | %-20s | %-5s |\n", "MSSV", "Ten", "GPA");
+    printf("+------------+----------------------+-------+\n");
+    for (int i = n - 1; i >= n - count; i--) {
+        printf("| %-10s | %-20s | %5.2f |\n", arr[i].mssv, arr[i].name, arr[i].gpa);
+    }
+    printf("+------------+----------------------+-------+\n");
+}
+
+// ── TÁCH ĐẠT / KHÔNG ĐẠT ───────────────────────────
+void bst_tach_dat(BSTNode *root, float nguong) {
+    Student arr[1000];
+    int n = bst_to_array(root, arr, 1000);
+    printf("== DAT (GP >= %1f) ==\n", nguong);
+    int co_dat = 0;
+    for (int i = 0; i < n; i++) {
+        if (arr[i].gpa >= nguong) {
+            printf("  %-10s | %-20s | %.2f\n", arr[i].mssv, arr[i].name, arr[i].gpa);
+            co_dat++;
+        }
+    }
+    if (!co_dat) printf("  Khong co sinh vien nao dat!\n");
+    printf("\n== KHONG DAT (GP < %1f) ==\n", nguong);
+    int khong_dat = 0;
+    for (int i = 0; i < n; i++) {
+        if (arr[i].gpa < nguong) {
+            printf("  %-10s | %-20s | %.2f\n", arr[i].mssv, arr[i].name, arr[i].gpa);
+            khong_dat++;
+        }
+    }
+    if (!khong_dat) printf("  Khong co sinh vien nao khong dat!\n");
 }
 
 // ── SAVE/LOAD ───────────────────────────────────────
