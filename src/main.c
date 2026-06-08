@@ -21,42 +21,10 @@ void input_student(Student *s) {
             printf("Ngay khong hop le cho thang %d nam %d. Vui long nhap lai.\n", s->dob.month, s->dob.year);
         }
     } while(s->dob.day > ngayTrongThang(s->dob.month, s->dob.year));
-    s->gpa = nhap_so_thuc("GPA    : ", 0.0, 4.0);
-}
-static void bst_save_recursive(BSTNode *root, FILE *f) {
-    if(!root) return;
-    bst_save_recursive(root->left, f);
-    fprintf(f, "%s|%s|%s|%02d/%02d/%04d|%.2f\n", root->data.mssv,
-         root->data.name, root->data.major, root->data.dob.day, 
-         root->data.dob.month, root->data.dob.year, root->data.gpa);
-    bst_save_recursive(root->right, f);
-}
-void bst_save(BSTNode *root, const char *filename) {
-    FILE *f = fopen(filename, "w");
-    if(!f) {
-        printf("Loi mo file %s\n", filename);
-        return;
-    }
-    bst_save_recursive(root, f);
-    fclose(f);
-}
-void bst_load(BSTNode **root, const char *filename) {
-    FILE *f = fopen(filename, "r");
-    if(!f) {
-        printf("Loi mo file %s\n", filename);
-        return;
-    }
-    char buffer[BUFFER_SIZE];
-    while(fgets(buffer, sizeof(buffer), f)) {
-        xoa_ky_tu_xuong_dong(buffer);
-        Student s;
-        if(sscanf(buffer, "%[^|]|%[^|]|%[^|]|%d/%d/%d|%f", s.mssv, s.name,
-             s.major, &s.dob.day, &s.dob.month, &s.dob.year, &s.gpa) == 7) {
-            *root = bst_insert(*root, s);
-        } else printf("Loi dinh dang du lieu: %s\n", buffer);
-    }
-    fclose(f);
-}
+    s->gk  = nhap_so_thuc("Diem GK (0-10): ", 0.0, 10.0);
+    s->tl  = nhap_so_thuc("Diem TL (0-10): ", 0.0, 10.0);
+    s->ck  = nhap_so_thuc("Diem CK (0-10): ", 0.0, 10.0);
+    s->gpa = tinhGPA(s->gk, s->tl, s->ck);}
 
 void menu() {
     printf("\n|=======================================|");
